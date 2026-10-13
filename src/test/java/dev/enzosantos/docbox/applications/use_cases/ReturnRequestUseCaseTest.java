@@ -1,4 +1,4 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,10 +11,10 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestCompletedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestReturnedPayload;
+import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,88 +26,85 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class CompleteRequestUseCaseTest {
+class ReturnRequestUseCaseTest {
 
   @Mock private RequestRepository requestRepository;
 
   @Mock private TimeProvider timeProvider;
 
-  @Mock private AbstractReceivedRequest receivedRequest;
+  @Mock private AbstractEvaluatedRequest evaluatedRequest;
 
-  @Mock private AbstractCompletedRequest completedRequest;
+  @Mock private AbstractReturnedRequest returnedRequest;
 
   @Mock private AbstractRequest request;
 
-  @InjectMocks private CompleteRequestUseCase useCase;
+  @InjectMocks private ReturnRequestUseCase useCase;
 
   @Test
-  void shouldMarkReceivedRequestAsCompletedWithProvidedValues()
+  void shouldMarkEvaluatedRequestAsReturnedWithProvidedValues()
       throws InvalidRequestTransitionException {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
-    final Instant completedAt = Instant.parse("2026-10-12T12:00:00Z");
+    final Instant returnedAt = Instant.parse("2026-10-12T12:00:00Z");
 
-    when(requestRepository.read(requestId)).thenReturn(Optional.of(receivedRequest));
-    when(timeProvider.provideInstant()).thenReturn(completedAt);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(evaluatedRequest));
+    when(timeProvider.provideInstant()).thenReturn(returnedAt);
 
     useCase.execute(requestId, userId);
 
-    final ArgumentCaptor<AbstractRequestCompletedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestCompletedPayload.class);
+    final ArgumentCaptor<AbstractRequestReturnedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(AbstractRequestReturnedPayload.class);
     verify(requestRepository).read(requestId);
-    verify(requestRepository).markAsCompleted(eq(requestId), payloadCaptor.capture());
+    verify(requestRepository).markAsReturned(eq(requestId), payloadCaptor.capture());
     verify(timeProvider).provideInstant();
 
-    final AbstractRequestCompletedPayload payload = payloadCaptor.getValue();
-    assertEquals(completedAt, payload.getCompletedAt());
-    assertEquals(userId, payload.getCompleterId());
+    final AbstractRequestReturnedPayload payload = payloadCaptor.getValue();
+    assertEquals(returnedAt, payload.getReturnedAt());
+    assertEquals(userId, payload.getReturnerId());
   }
 
   @Test
-  void shouldRejectCompletingRequestThatIsNotReceived() {
+  void shouldRejectReturningRequestThatIsNotEvaluated() {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsCompleted(any(UUID.class), any(AbstractRequestCompletedPayload.class));
+        .markAsReturned(any(UUID.class), any(AbstractRequestReturnedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
   @Test
-  void shouldRejectCompletingAlreadyCompletedRequest() {
+  void shouldRejectReturningAlreadyReturnedRequest() {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
-    when(requestRepository.read(requestId)).thenReturn(Optional.of(completedRequest));
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(returnedRequest));
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsCompleted(any(UUID.class), any(AbstractRequestCompletedPayload.class));
+        .markAsReturned(any(UUID.class), any(AbstractRequestReturnedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
   @Test
-  void shouldRejectCompletingRequestThatDoesNotExist() {
+  void shouldRejectReturningRequestThatDoesNotExist() {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsCompleted(any(UUID.class), any(AbstractRequestCompletedPayload.class));
+        .markAsReturned(any(UUID.class), any(AbstractRequestReturnedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 }

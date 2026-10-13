@@ -1,21 +1,22 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
+import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
+import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public class AcknowledgeRequestUseCase {
+public class SendRequestUseCase {
   private final RequestRepository requestRepository;
   private final TimeProvider timeProvider;
 
-  public AcknowledgeRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
+  public SendRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
     this.requestRepository = requestRepository;
     this.timeProvider = timeProvider;
   }
@@ -27,25 +28,26 @@ public class AcknowledgeRequestUseCase {
     }
 
     final AbstractRequest request = requestResult.get();
-    if (request instanceof AbstractAcknowledgedRequest) {
-      throw new InvalidRequestTransitionException();
-    }
-    if (!(request instanceof AbstractSentRequest)) {
+    final boolean isRejectedReceivedRequest =
+        request instanceof AbstractReceivedRequest receivedRequest
+            && receivedRequest.getEvaluation() instanceof AbstractRequestRejection;
+    final boolean isInitialRequest = !(request instanceof AbstractSentRequest);
+
+    if (!isInitialRequest && !isRejectedReceivedRequest) {
       throw new InvalidRequestTransitionException();
     }
 
-    final Instant acknowledgedAt = timeProvider.provideInstant();
-    requestRepository.markAsAcknowledged(
+    final Instant sentAt = timeProvider.provideInstant();
+    requestRepository.markAsSent(
         id,
-        new AbstractRequestAcknowledgedPayload() {
-
+        new AbstractRequestSentPayload() {
           @Override
-          public Instant getAcknowledgedAt() {
-            return acknowledgedAt;
+          public Instant getSentAt() {
+            return sentAt;
           }
 
           @Override
-          public UUID getAcknowledgerId() {
+          public UUID getSenderId() {
             return userId;
           }
         });

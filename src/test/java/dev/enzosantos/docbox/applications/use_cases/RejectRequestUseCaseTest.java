@@ -1,4 +1,4 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -74,8 +74,7 @@ class RejectRequestUseCaseTest {
     when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
 
     assertThrows(
-        InvalidRequestTransitionException.class,
-        () -> useCase.execute(requestId, userId, reason));
+        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId, reason));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
@@ -92,8 +91,7 @@ class RejectRequestUseCaseTest {
     when(requestRepository.read(requestId)).thenReturn(Optional.of(evaluatedRequest));
 
     assertThrows(
-        InvalidRequestTransitionException.class,
-        () -> useCase.execute(requestId, userId, reason));
+        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId, reason));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
@@ -110,8 +108,7 @@ class RejectRequestUseCaseTest {
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
     assertThrows(
-        InvalidRequestTransitionException.class,
-        () -> useCase.execute(requestId, userId, reason));
+        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId, reason));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())

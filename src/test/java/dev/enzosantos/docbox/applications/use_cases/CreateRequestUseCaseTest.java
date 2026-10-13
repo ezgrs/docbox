@@ -1,4 +1,4 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;

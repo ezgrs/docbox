@@ -1,22 +1,21 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SendRequestUseCase {
+public class ReceiveRequestUseCase {
   private final RequestRepository requestRepository;
   private final TimeProvider timeProvider;
 
-  public SendRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
+  public ReceiveRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
     this.requestRepository = requestRepository;
     this.timeProvider = timeProvider;
   }
@@ -28,26 +27,24 @@ public class SendRequestUseCase {
     }
 
     final AbstractRequest request = requestResult.get();
-    final boolean isRejectedReceivedRequest =
-        request instanceof AbstractReceivedRequest receivedRequest
-            && receivedRequest.getEvaluation() instanceof AbstractRequestRejection;
-    final boolean isInitialRequest = !(request instanceof AbstractSentRequest);
-
-    if (!isInitialRequest && !isRejectedReceivedRequest) {
+    final boolean isStrictlyReturned =
+        request instanceof AbstractReturnedRequest && !(request instanceof AbstractReceivedRequest);
+    if (!isStrictlyReturned) {
       throw new InvalidRequestTransitionException();
     }
 
-    final Instant sentAt = timeProvider.provideInstant();
-    requestRepository.markAsSent(
+    final Instant receivedAt = timeProvider.provideInstant();
+    requestRepository.markAsReceived(
         id,
-        new AbstractRequestSentPayload() {
+        new AbstractRequestReceivedPayload() {
+
           @Override
-          public Instant getSentAt() {
-            return sentAt;
+          public Instant getReceivedAt() {
+            return receivedAt;
           }
 
           @Override
-          public UUID getSenderId() {
+          public UUID getReceiverId() {
             return userId;
           }
         });

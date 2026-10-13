@@ -1,9 +1,9 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestEvaluatedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestRejectedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
@@ -11,16 +11,17 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public class AcceptRequestUseCase {
+public class RejectRequestUseCase {
   private final RequestRepository requestRepository;
   private final TimeProvider timeProvider;
 
-  public AcceptRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
+  public RejectRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
     this.requestRepository = requestRepository;
     this.timeProvider = timeProvider;
   }
 
-  public void execute(UUID id, UUID userId) throws InvalidRequestTransitionException {
+  public void execute(UUID id, UUID userId, String reason)
+      throws InvalidRequestTransitionException {
     final Optional<AbstractRequest> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
       throw new InvalidRequestTransitionException();
@@ -34,19 +35,24 @@ public class AcceptRequestUseCase {
       throw new InvalidRequestTransitionException();
     }
 
-    final Instant acceptedAt = timeProvider.provideInstant();
-    requestRepository.markAsAccepted(
+    final Instant rejectedAt = timeProvider.provideInstant();
+    requestRepository.markAsRejected(
         id,
-        new AbstractRequestEvaluatedPayload() {
+        new AbstractRequestRejectedPayload() {
 
           @Override
           public Instant getEvaluatedAt() {
-            return acceptedAt;
+            return rejectedAt;
           }
 
           @Override
           public UUID getEvaluatorId() {
             return userId;
+          }
+
+          @Override
+          public String getRejectionReason() {
+            return reason;
           }
         });
   }

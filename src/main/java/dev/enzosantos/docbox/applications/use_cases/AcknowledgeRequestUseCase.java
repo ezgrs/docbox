@@ -1,21 +1,21 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestReturnedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
+import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
+import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ReturnRequestUseCase {
+public class AcknowledgeRequestUseCase {
   private final RequestRepository requestRepository;
   private final TimeProvider timeProvider;
 
-  public ReturnRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
+  public AcknowledgeRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
     this.requestRepository = requestRepository;
     this.timeProvider = timeProvider;
   }
@@ -27,24 +27,25 @@ public class ReturnRequestUseCase {
     }
 
     final AbstractRequest request = requestResult.get();
-    final boolean isStrictlyEvaluated =
-        request instanceof AbstractEvaluatedRequest && !(request instanceof AbstractReturnedRequest);
-    if (!isStrictlyEvaluated) {
+    if (request instanceof AbstractAcknowledgedRequest) {
+      throw new InvalidRequestTransitionException();
+    }
+    if (!(request instanceof AbstractSentRequest)) {
       throw new InvalidRequestTransitionException();
     }
 
-    final Instant returnedAt = timeProvider.provideInstant();
-    requestRepository.markAsReturned(
+    final Instant acknowledgedAt = timeProvider.provideInstant();
+    requestRepository.markAsAcknowledged(
         id,
-        new AbstractRequestReturnedPayload() {
+        new AbstractRequestAcknowledgedPayload() {
 
           @Override
-          public Instant getReturnedAt() {
-            return returnedAt;
+          public Instant getAcknowledgedAt() {
+            return acknowledgedAt;
           }
 
           @Override
-          public UUID getReturnerId() {
+          public UUID getAcknowledgerId() {
             return userId;
           }
         });

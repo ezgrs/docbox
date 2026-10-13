@@ -1,21 +1,21 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestCompletedPayload;
+import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ReceiveRequestUseCase {
+public class CompleteRequestUseCase {
   private final RequestRepository requestRepository;
   private final TimeProvider timeProvider;
 
-  public ReceiveRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
+  public CompleteRequestUseCase(RequestRepository requestRepository, TimeProvider timeProvider) {
     this.requestRepository = requestRepository;
     this.timeProvider = timeProvider;
   }
@@ -27,24 +27,25 @@ public class ReceiveRequestUseCase {
     }
 
     final AbstractRequest request = requestResult.get();
-    final boolean isStrictlyReturned =
-        request instanceof AbstractReturnedRequest && !(request instanceof AbstractReceivedRequest);
-    if (!isStrictlyReturned) {
+    final boolean isStrictlyReceived =
+        request instanceof AbstractReceivedRequest
+            && !(request instanceof AbstractCompletedRequest);
+    if (!isStrictlyReceived) {
       throw new InvalidRequestTransitionException();
     }
 
-    final Instant receivedAt = timeProvider.provideInstant();
-    requestRepository.markAsReceived(
+    final Instant completedAt = timeProvider.provideInstant();
+    requestRepository.markAsCompleted(
         id,
-        new AbstractRequestReceivedPayload() {
+        new AbstractRequestCompletedPayload() {
 
           @Override
-          public Instant getReceivedAt() {
-            return receivedAt;
+          public Instant getCompletedAt() {
+            return completedAt;
           }
 
           @Override
-          public UUID getReceiverId() {
+          public UUID getCompleterId() {
             return userId;
           }
         });

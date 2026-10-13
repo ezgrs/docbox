@@ -1,4 +1,4 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;

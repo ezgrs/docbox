@@ -1,4 +1,4 @@
-package dev.enzosantos.docbox.applications.usecases;
+package dev.enzosantos.docbox.applications.use_cases;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -52,8 +52,7 @@ class DeleteRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(sentRequest));
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
@@ -65,8 +64,7 @@ class DeleteRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(completedRequest));
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
@@ -78,8 +76,7 @@ class DeleteRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
