@@ -1,9 +1,10 @@
 package dev.enzosantos.docbox.domain.requests;
 
 import java.time.Instant;
+import java.util.UUID;
 
-public interface AbstractReceivedRequest {
+public interface AbstractRequestReceivedPayload {
   Instant getReceivedAt();
 
-  String getReceiverId();
+  UUID getReceiverId();
 }
