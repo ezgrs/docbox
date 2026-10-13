@@ -7,6 +7,7 @@ import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestRejectedPayload;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestReturnedPayload;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestUpdatedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +16,8 @@ public interface RequestRepository {
   void create(AbstractRequest request);
 
   Optional<AbstractRequest> read(UUID id);
+
+  void update(UUID id, AbstractRequestUpdatedPayload payload);
 
   void delete(UUID id);
 
