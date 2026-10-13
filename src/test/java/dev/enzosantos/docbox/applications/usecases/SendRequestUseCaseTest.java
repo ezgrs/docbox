@@ -15,7 +15,7 @@ import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
 import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestEvaluation;
 import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
 import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.time.Instant;
@@ -41,7 +41,7 @@ class SendRequestUseCaseTest {
 
   @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
 
-  @Mock private AbstractEvaluatedRequest evaluatedRequest;
+  @Mock private AbstractReceivedRequest receivedRequest;
 
   @Mock private AbstractRequestEvaluation evaluation;
 
@@ -109,8 +109,8 @@ class SendRequestUseCaseTest {
             AbstractRequestEvaluation.class,
             Mockito.withSettings().extraInterfaces(AbstractRequestRejection.class));
 
-    when(requestRepository.read(requestId)).thenReturn(evaluatedRequest);
-    when(evaluatedRequest.getEvaluation()).thenReturn(rejection);
+    when(requestRepository.read(requestId)).thenReturn(receivedRequest);
+    when(receivedRequest.getEvaluation()).thenReturn(rejection);
     when(timeProvider.provideInstant()).thenReturn(sentAt);
 
     useCase.execute(requestId, userId);
@@ -125,8 +125,8 @@ class SendRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
-    when(requestRepository.read(requestId)).thenReturn(evaluatedRequest);
-    when(evaluatedRequest.getEvaluation()).thenReturn(evaluation);
+    when(requestRepository.read(requestId)).thenReturn(receivedRequest);
+    when(receivedRequest.getEvaluation()).thenReturn(evaluation);
 
     assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 

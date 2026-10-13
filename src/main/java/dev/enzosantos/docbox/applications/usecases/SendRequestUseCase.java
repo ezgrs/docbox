@@ -6,6 +6,7 @@ import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
 import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
 import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.time.Instant;
@@ -22,7 +23,7 @@ public class SendRequestUseCase {
 
   public void execute(UUID id, UUID userId) throws InvalidRequestTransitionException {
     final AbstractRequest request = requestRepository.read(id);
-    if (request instanceof AbstractEvaluatedRequest
+    if (request instanceof AbstractReceivedRequest
         && ((AbstractEvaluatedRequest) request).getEvaluation()
             instanceof AbstractRequestRejection) {
 
