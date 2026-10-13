@@ -13,6 +13,8 @@ import java.util.UUID;
 public interface RequestRepository {
   void create(AbstractRequest request);
 
+  AbstractRequest read(UUID id);
+
   void markAsSent(UUID id, AbstractRequestSentPayload payload);
 
   void markAsAcknowledged(UUID id, AbstractRequestAcknowledgedPayload payload);
