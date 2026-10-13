@@ -12,10 +12,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestAcknowledgedPayload;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,11 +33,11 @@ class AcknowledgeRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
-  @Mock private AbstractRequest request;
+  @Mock private Request request;
 
-  @Mock private AbstractSentRequest sentRequest;
+  @Mock private SentRequest sentRequest;
 
-  @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
+  @Mock private AcknowledgedRequest acknowledgedRequest;
 
   @InjectMocks private AcknowledgeRequestUseCase useCase;
 
@@ -53,13 +53,13 @@ class AcknowledgeRequestUseCaseTest {
 
     useCase.execute(requestId, userId);
 
-    final ArgumentCaptor<AbstractRequestAcknowledgedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestAcknowledgedPayload.class);
+    final ArgumentCaptor<RequestAcknowledgedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestAcknowledgedPayload.class);
     verify(requestRepository).read(requestId);
     verify(requestRepository).markAsAcknowledged(eq(requestId), payloadCaptor.capture());
     verify(timeProvider).provideInstant();
 
-    final AbstractRequestAcknowledgedPayload payload = payloadCaptor.getValue();
+    final RequestAcknowledgedPayload payload = payloadCaptor.getValue();
     assertEquals(acknowledgedAt, payload.getAcknowledgedAt());
     assertEquals(userId, payload.getAcknowledgerId());
   }
@@ -75,7 +75,7 @@ class AcknowledgeRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsAcknowledged(any(UUID.class), any(AbstractRequestAcknowledgedPayload.class));
+        .markAsAcknowledged(any(UUID.class), any(RequestAcknowledgedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -90,7 +90,7 @@ class AcknowledgeRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsAcknowledged(any(UUID.class), any(AbstractRequestAcknowledgedPayload.class));
+        .markAsAcknowledged(any(UUID.class), any(RequestAcknowledgedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -105,7 +105,7 @@ class AcknowledgeRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsAcknowledged(any(UUID.class), any(AbstractRequestAcknowledgedPayload.class));
+        .markAsAcknowledged(any(UUID.class), any(RequestAcknowledgedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 }

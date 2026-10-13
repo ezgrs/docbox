@@ -17,14 +17,14 @@ import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
-import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
+import dev.enzosantos.docbox.domain.attachments.Attachment;
 import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.EvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Instant;
@@ -51,15 +51,15 @@ class AddSignatureUseCaseTest {
 
   @Mock private FileStorage fileStorage;
 
-  @Mock private AbstractAttachment originalAttachment;
+  @Mock private Attachment originalAttachment;
 
-  @Mock private AbstractAttachment signedAttachment;
+  @Mock private Attachment signedAttachment;
 
-  @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
+  @Mock private AcknowledgedRequest acknowledgedRequest;
 
-  @Mock private AbstractEvaluatedRequest evaluatedRequest;
+  @Mock private EvaluatedRequest evaluatedRequest;
 
-  @Mock private AbstractRequest unacknowledgedRequest;
+  @Mock private Request unacknowledgedRequest;
 
   @InjectMocks private AddSignatureUseCase useCase;
 
@@ -82,15 +82,15 @@ class AddSignatureUseCaseTest {
 
     assertDoesNotThrow(() -> useCase.execute(originalId, stream, userId));
 
-    final ArgumentCaptor<AbstractAttachment> attachmentCaptor =
-        ArgumentCaptor.forClass(AbstractAttachment.class);
+    final ArgumentCaptor<Attachment> attachmentCaptor =
+        ArgumentCaptor.forClass(Attachment.class);
     final String expectedPath =
         String.format("attachments/%s/signed/%s", requestId, signedId);
     final InOrder inOrder = inOrder(fileStorage, attachmentRepository);
     inOrder.verify(fileStorage).upload(eq(expectedPath), same(stream));
     inOrder.verify(attachmentRepository).create(attachmentCaptor.capture());
 
-    final AbstractAttachment signed = attachmentCaptor.getValue();
+    final Attachment signed = attachmentCaptor.getValue();
     assertEquals(signedId, signed.getId());
     assertEquals("document.pdf", signed.getName());
     assertEquals(requestId, signed.getRequestId());
@@ -174,7 +174,7 @@ class AddSignatureUseCaseTest {
     verifyNoCreationSideEffects();
   }
 
-  private void assertRejectsForRequest(AbstractRequest request) {
+  private void assertRejectsForRequest(Request request) {
     final UUID originalId = UUID.randomUUID();
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
@@ -199,6 +199,6 @@ class AddSignatureUseCaseTest {
     verify(identityProvider, never()).provideUuid();
     verify(timeProvider, never()).provideInstant();
     verify(fileStorage, never()).upload(anyString(), any(InputStream.class));
-    verify(attachmentRepository, never()).create(any(AbstractAttachment.class));
+    verify(attachmentRepository, never()).create(any(Attachment.class));
   }
 }

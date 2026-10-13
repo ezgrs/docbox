@@ -5,9 +5,9 @@ import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestUpdatedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestUpdatedPayload;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,13 +25,13 @@ public class UpdateRequestUseCase {
       throws RequestNotFoundException,
           InvalidRequestTransitionException,
           UnauthorizedRequestException {
-    final Optional<AbstractRequest> requestResult = requestRepository.read(id);
+    final Optional<Request> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
-    if (request instanceof AbstractSentRequest) {
+    final Request request = requestResult.get();
+    if (request instanceof SentRequest) {
       throw new InvalidRequestTransitionException();
     }
 
@@ -42,7 +42,7 @@ public class UpdateRequestUseCase {
     final Instant updatedAt = timeProvider.provideInstant();
     requestRepository.update(
         id,
-        new AbstractRequestUpdatedPayload() {
+        new RequestUpdatedPayload() {
           @Override
           public String getName() {
             return name;

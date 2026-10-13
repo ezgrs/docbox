@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,13 +42,13 @@ class CreateRequestUseCaseTest {
 
     useCase.execute(name, description, userId);
 
-    final ArgumentCaptor<AbstractRequest> requestCaptor =
-        ArgumentCaptor.forClass(AbstractRequest.class);
+    final ArgumentCaptor<Request> requestCaptor =
+        ArgumentCaptor.forClass(Request.class);
     verify(requestRepository).create(requestCaptor.capture());
     verify(identityProvider).provideUuid();
     verify(timeProvider).provideInstant();
 
-    final AbstractRequest request = requestCaptor.getValue();
+    final Request request = requestCaptor.getValue();
     assertEquals(id, request.getId());
     assertEquals(name, request.getName());
     assertEquals(description, request.getDescription());
@@ -70,13 +70,13 @@ class CreateRequestUseCaseTest {
 
     useCase.execute(name, description, userId);
 
-    final ArgumentCaptor<AbstractRequest> requestCaptor =
-        ArgumentCaptor.forClass(AbstractRequest.class);
+    final ArgumentCaptor<Request> requestCaptor =
+        ArgumentCaptor.forClass(Request.class);
     verify(requestRepository).create(requestCaptor.capture());
     verify(identityProvider).provideUuid();
     verify(timeProvider).provideInstant();
 
-    final AbstractRequest request = requestCaptor.getValue();
+    final Request request = requestCaptor.getValue();
     assertEquals(id, request.getId());
     assertEquals(name, request.getName());
     assertEquals(description, request.getDescription());

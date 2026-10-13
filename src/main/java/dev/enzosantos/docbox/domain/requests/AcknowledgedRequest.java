@@ -3,7 +3,7 @@ package dev.enzosantos.docbox.domain.requests;
 import java.time.Instant;
 import java.util.UUID;
 
-public interface AbstractAcknowledgedRequest extends AbstractSentRequest {
+public interface AcknowledgedRequest extends SentRequest {
   Instant getAcknowledgedAt();
 
   UUID getAcknowledgerId();

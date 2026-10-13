@@ -13,10 +13,10 @@ import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestUpdatedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestUpdatedPayload;
+import dev.enzosantos.docbox.domain.requests.CompletedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,11 +34,11 @@ class UpdateRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
-  @Mock private AbstractRequest request;
+  @Mock private Request request;
 
-  @Mock private AbstractSentRequest sentRequest;
+  @Mock private SentRequest sentRequest;
 
-  @Mock private AbstractCompletedRequest completedRequest;
+  @Mock private CompletedRequest completedRequest;
 
   @InjectMocks private UpdateRequestUseCase useCase;
 
@@ -59,12 +59,12 @@ class UpdateRequestUseCaseTest {
 
     useCase.execute(requestId, name, description, userId);
 
-    final ArgumentCaptor<AbstractRequestUpdatedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestUpdatedPayload.class);
+    final ArgumentCaptor<RequestUpdatedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestUpdatedPayload.class);
     verify(requestRepository).read(requestId);
     verify(requestRepository).update(eq(requestId), payloadCaptor.capture());
 
-    final AbstractRequestUpdatedPayload payload = payloadCaptor.getValue();
+    final RequestUpdatedPayload payload = payloadCaptor.getValue();
     assertEquals(name, payload.getName());
     assertEquals(description, payload.getDescription());
     assertEquals(updatedAt, payload.getUpdatedAt());
@@ -88,8 +88,8 @@ class UpdateRequestUseCaseTest {
 
     useCase.execute(requestId, name, description, userId);
 
-    final ArgumentCaptor<AbstractRequestUpdatedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestUpdatedPayload.class);
+    final ArgumentCaptor<RequestUpdatedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestUpdatedPayload.class);
     verify(requestRepository).update(eq(requestId), payloadCaptor.capture());
     assertEquals(description, payloadCaptor.getValue().getDescription());
     assertEquals(updatedAt, payloadCaptor.getValue().getUpdatedAt());
@@ -109,7 +109,7 @@ class UpdateRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .update(any(UUID.class), any(AbstractRequestUpdatedPayload.class));
+        .update(any(UUID.class), any(RequestUpdatedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -126,7 +126,7 @@ class UpdateRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .update(any(UUID.class), any(AbstractRequestUpdatedPayload.class));
+        .update(any(UUID.class), any(RequestUpdatedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -143,7 +143,7 @@ class UpdateRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .update(any(UUID.class), any(AbstractRequestUpdatedPayload.class));
+        .update(any(UUID.class), any(RequestUpdatedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -162,7 +162,7 @@ class UpdateRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .update(any(UUID.class), any(AbstractRequestUpdatedPayload.class));
+        .update(any(UUID.class), any(RequestUpdatedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 }

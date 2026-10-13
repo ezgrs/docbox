@@ -5,14 +5,14 @@ import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
-import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
+import dev.enzosantos.docbox.domain.attachments.Attachment;
 import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.EvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.Optional;
@@ -44,31 +44,31 @@ public class AddSignatureUseCase {
           RequestNotFoundException,
           InvalidRequestTransitionException,
           UnauthorizedRequestException {
-    final Optional<AbstractAttachment> originalAttachmentResult =
+    final Optional<Attachment> originalAttachmentResult =
         attachmentRepository.read(originalId);
     if (originalAttachmentResult.isEmpty()) {
       throw new AttachmentNotFoundException();
     }
 
-    final AbstractAttachment originalAttachment = originalAttachmentResult.get();
+    final Attachment originalAttachment = originalAttachmentResult.get();
     if (originalAttachment.getOriginalAttachmentId().isPresent()) {
       throw new InvalidRequestTransitionException();
     }
 
     final UUID requestId = originalAttachment.getRequestId();
-    final Optional<AbstractRequest> requestResult = requestRepository.read(requestId);
+    final Optional<Request> requestResult = requestRepository.read(requestId);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
-    if (!(request instanceof AbstractAcknowledgedRequest)
-        || request instanceof AbstractEvaluatedRequest) {
+    final Request request = requestResult.get();
+    if (!(request instanceof AcknowledgedRequest)
+        || request instanceof EvaluatedRequest) {
       throw new InvalidRequestTransitionException();
     }
 
-    final AbstractAcknowledgedRequest acknowledgedRequest =
-        (AbstractAcknowledgedRequest) request;
+    final AcknowledgedRequest acknowledgedRequest =
+        (AcknowledgedRequest) request;
     if (!userId.equals(acknowledgedRequest.getAcknowledgerId())) {
       throw new UnauthorizedRequestException();
     }
@@ -78,7 +78,7 @@ public class AddSignatureUseCase {
     this.fileStorage.upload(
         String.format("attachments/%s/signed/%s", requestId.toString(), id.toString()), stream);
     this.attachmentRepository.create(
-        new AbstractAttachment() {
+        new Attachment() {
           @Override
           public UUID getId() {
             return id;

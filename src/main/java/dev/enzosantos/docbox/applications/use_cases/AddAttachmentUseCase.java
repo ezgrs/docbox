@@ -5,14 +5,14 @@ import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
-import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
+import dev.enzosantos.docbox.domain.attachments.Attachment;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestRejection;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.io.InputStream;
 import java.time.Instant;
 import java.util.Optional;
@@ -43,16 +43,16 @@ public class AddAttachmentUseCase {
       throws RequestNotFoundException,
           InvalidRequestTransitionException,
           UnauthorizedRequestException {
-    final Optional<AbstractRequest> requestResult = requestRepository.read(requestId);
+    final Optional<Request> requestResult = requestRepository.read(requestId);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
-    final boolean isDraft = !(request instanceof AbstractSentRequest);
+    final Request request = requestResult.get();
+    final boolean isDraft = !(request instanceof SentRequest);
     final boolean isRejected =
-        request instanceof AbstractReceivedRequest receivedRequest
-            && (receivedRequest.getEvaluation() instanceof AbstractRequestRejection);
+        request instanceof ReceivedRequest receivedRequest
+            && (receivedRequest.getEvaluation() instanceof RequestRejection);
     // Permite solicitações ainda não enviadas ou solicitações negadas recebidas
     if (!isDraft && !isRejected) {
       throw new InvalidRequestTransitionException();
@@ -69,7 +69,7 @@ public class AddAttachmentUseCase {
     this.fileStorage.upload(
         String.format("attachments/%s/original/%s", requestId.toString(), id.toString()), stream);
     this.attachmentRepository.create(
-        new AbstractAttachment() {
+        new Attachment() {
           @Override
           public UUID getId() {
             return id;

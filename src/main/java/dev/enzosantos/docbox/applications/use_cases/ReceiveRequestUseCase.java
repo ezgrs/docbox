@@ -4,10 +4,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestReceivedPayload;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.ReturnedRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,14 +23,14 @@ public class ReceiveRequestUseCase {
 
   public void execute(UUID id, UUID userId)
       throws RequestNotFoundException, InvalidRequestTransitionException {
-    final Optional<AbstractRequest> requestResult = requestRepository.read(id);
+    final Optional<Request> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
+    final Request request = requestResult.get();
     final boolean isStrictlyReturned =
-        request instanceof AbstractReturnedRequest && !(request instanceof AbstractReceivedRequest);
+        request instanceof ReturnedRequest && !(request instanceof ReceivedRequest);
     if (!isStrictlyReturned) {
       throw new InvalidRequestTransitionException();
     }
@@ -38,7 +38,7 @@ public class ReceiveRequestUseCase {
     final Instant receivedAt = timeProvider.provideInstant();
     requestRepository.markAsReceived(
         id,
-        new AbstractRequestReceivedPayload() {
+        new RequestReceivedPayload() {
 
           @Override
           public Instant getReceivedAt() {

@@ -3,7 +3,7 @@ package dev.enzosantos.docbox.applications.use_cases;
 import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,7 +26,7 @@ public class CreateRequestUseCase {
     final UUID id = identityProvider.provideUuid();
     final Instant createdAt = timeProvider.provideInstant();
     this.requestRepository.create(
-        new AbstractRequest() {
+        new Request() {
           @Override
           public UUID getId() {
             return id;

@@ -12,10 +12,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestCompletedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestCompletedPayload;
+import dev.enzosantos.docbox.domain.requests.CompletedRequest;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,11 +33,11 @@ class CompleteRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
-  @Mock private AbstractReceivedRequest receivedRequest;
+  @Mock private ReceivedRequest receivedRequest;
 
-  @Mock private AbstractCompletedRequest completedRequest;
+  @Mock private CompletedRequest completedRequest;
 
-  @Mock private AbstractRequest request;
+  @Mock private Request request;
 
   @InjectMocks private CompleteRequestUseCase useCase;
 
@@ -53,13 +53,13 @@ class CompleteRequestUseCaseTest {
 
     useCase.execute(requestId, userId);
 
-    final ArgumentCaptor<AbstractRequestCompletedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestCompletedPayload.class);
+    final ArgumentCaptor<RequestCompletedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestCompletedPayload.class);
     verify(requestRepository).read(requestId);
     verify(requestRepository).markAsCompleted(eq(requestId), payloadCaptor.capture());
     verify(timeProvider).provideInstant();
 
-    final AbstractRequestCompletedPayload payload = payloadCaptor.getValue();
+    final RequestCompletedPayload payload = payloadCaptor.getValue();
     assertEquals(completedAt, payload.getCompletedAt());
     assertEquals(userId, payload.getCompleterId());
   }
@@ -75,7 +75,7 @@ class CompleteRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsCompleted(any(UUID.class), any(AbstractRequestCompletedPayload.class));
+        .markAsCompleted(any(UUID.class), any(RequestCompletedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -90,7 +90,7 @@ class CompleteRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsCompleted(any(UUID.class), any(AbstractRequestCompletedPayload.class));
+        .markAsCompleted(any(UUID.class), any(RequestCompletedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -105,7 +105,7 @@ class CompleteRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsCompleted(any(UUID.class), any(AbstractRequestCompletedPayload.class));
+        .markAsCompleted(any(UUID.class), any(RequestCompletedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 }

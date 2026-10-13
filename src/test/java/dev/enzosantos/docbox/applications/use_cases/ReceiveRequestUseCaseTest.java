@@ -12,10 +12,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestReceivedPayload;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.ReturnedRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,11 +33,11 @@ class ReceiveRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
-  @Mock private AbstractReturnedRequest returnedRequest;
+  @Mock private ReturnedRequest returnedRequest;
 
-  @Mock private AbstractReceivedRequest receivedRequest;
+  @Mock private ReceivedRequest receivedRequest;
 
-  @Mock private AbstractRequest request;
+  @Mock private Request request;
 
   @InjectMocks private ReceiveRequestUseCase useCase;
 
@@ -53,13 +53,13 @@ class ReceiveRequestUseCaseTest {
 
     useCase.execute(requestId, userId);
 
-    final ArgumentCaptor<AbstractRequestReceivedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestReceivedPayload.class);
+    final ArgumentCaptor<RequestReceivedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestReceivedPayload.class);
     verify(requestRepository).read(requestId);
     verify(requestRepository).markAsReceived(eq(requestId), payloadCaptor.capture());
     verify(timeProvider).provideInstant();
 
-    final AbstractRequestReceivedPayload payload = payloadCaptor.getValue();
+    final RequestReceivedPayload payload = payloadCaptor.getValue();
     assertEquals(receivedAt, payload.getReceivedAt());
     assertEquals(userId, payload.getReceiverId());
   }
@@ -75,7 +75,7 @@ class ReceiveRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsReceived(any(UUID.class), any(AbstractRequestReceivedPayload.class));
+        .markAsReceived(any(UUID.class), any(RequestReceivedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -90,7 +90,7 @@ class ReceiveRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsReceived(any(UUID.class), any(AbstractRequestReceivedPayload.class));
+        .markAsReceived(any(UUID.class), any(RequestReceivedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -105,7 +105,7 @@ class ReceiveRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsReceived(any(UUID.class), any(AbstractRequestReceivedPayload.class));
+        .markAsReceived(any(UUID.class), any(RequestReceivedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 }

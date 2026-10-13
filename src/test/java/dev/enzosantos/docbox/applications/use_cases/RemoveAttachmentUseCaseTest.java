@@ -13,17 +13,17 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.AttachmentRepository;
 import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
-import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
+import dev.enzosantos.docbox.domain.attachments.Attachment;
 import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestApproval;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestApproval;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestRejection;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.ReturnedRequest;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -42,21 +42,21 @@ class RemoveAttachmentUseCaseTest {
 
   @Mock private FileStorage fileStorage;
 
-  @Mock private AbstractAttachment attachment;
+  @Mock private Attachment attachment;
 
-  @Mock private AbstractRequest draftRequest;
+  @Mock private Request draftRequest;
 
-  @Mock private AbstractReceivedRequest rejectedRequest;
+  @Mock private ReceivedRequest rejectedRequest;
 
-  @Mock private AbstractReceivedRequest approvedRequest;
+  @Mock private ReceivedRequest approvedRequest;
 
-  @Mock private AbstractSentRequest sentRequest;
+  @Mock private SentRequest sentRequest;
 
-  @Mock private AbstractReturnedRequest returnedRequest;
+  @Mock private ReturnedRequest returnedRequest;
 
-  @Mock private AbstractRequestRejection rejection;
+  @Mock private RequestRejection rejection;
 
-  @Mock private AbstractRequestApproval approval;
+  @Mock private RequestApproval approval;
 
   @InjectMocks private RemoveAttachmentUseCase useCase;
 
@@ -171,7 +171,7 @@ class RemoveAttachmentUseCaseTest {
     verifyNoRemoval();
   }
 
-  private void assertRejectsForInvalidRequest(AbstractRequest request) {
+  private void assertRejectsForInvalidRequest(Request request) {
     final UUID attachmentId = UUID.randomUUID();
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();

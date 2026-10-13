@@ -4,10 +4,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestEvaluatedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestEvaluatedPayload;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.EvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,15 +23,15 @@ public class AcceptRequestUseCase {
 
   public void execute(UUID id, UUID userId)
       throws RequestNotFoundException, InvalidRequestTransitionException {
-    final Optional<AbstractRequest> requestResult = requestRepository.read(id);
+    final Optional<Request> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
+    final Request request = requestResult.get();
     final boolean isStrictlyAcknowledged =
-        request instanceof AbstractAcknowledgedRequest
-            && !(request instanceof AbstractEvaluatedRequest);
+        request instanceof AcknowledgedRequest
+            && !(request instanceof EvaluatedRequest);
     if (!isStrictlyAcknowledged) {
       throw new InvalidRequestTransitionException();
     }
@@ -39,7 +39,7 @@ public class AcceptRequestUseCase {
     final Instant acceptedAt = timeProvider.provideInstant();
     requestRepository.markAsAccepted(
         id,
-        new AbstractRequestEvaluatedPayload() {
+        new RequestEvaluatedPayload() {
 
           @Override
           public Instant getEvaluatedAt() {

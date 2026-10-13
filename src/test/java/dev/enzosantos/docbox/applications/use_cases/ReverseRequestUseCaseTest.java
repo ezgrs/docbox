@@ -12,16 +12,16 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestEvaluatedPayload;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestRejectedPayload;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestApproval;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestEvaluation;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestEvaluatedPayload;
+import dev.enzosantos.docbox.domain.payloads.RequestRejectedPayload;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestApproval;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestEvaluation;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestRejection;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.CompletedRequest;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.ReturnedRequest;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,21 +37,21 @@ class ReverseRequestUseCaseTest {
 
   @Mock private RequestRepository requestRepository;
 
-  @Mock private AbstractSentRequest sentRequest;
+  @Mock private SentRequest sentRequest;
 
-  @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
+  @Mock private AcknowledgedRequest acknowledgedRequest;
 
-  @Mock private AbstractReturnedRequest returnedRequest;
+  @Mock private ReturnedRequest returnedRequest;
 
-  @Mock private AbstractReceivedRequest receivedRequest;
+  @Mock private ReceivedRequest receivedRequest;
 
-  @Mock private AbstractCompletedRequest completedRequest;
+  @Mock private CompletedRequest completedRequest;
 
-  @Mock private AbstractRequestEvaluation evaluation;
+  @Mock private RequestEvaluation evaluation;
 
-  @Mock private AbstractRequestApproval approval;
+  @Mock private RequestApproval approval;
 
-  @Mock private AbstractRequestRejection rejection;
+  @Mock private RequestRejection rejection;
 
   @InjectMocks private ReverseRequestUseCase useCase;
 
@@ -84,9 +84,9 @@ class ReverseRequestUseCaseTest {
     verify(requestRepository).read(requestId);
     verify(requestRepository).markAsNew(requestId);
     verify(requestRepository, never())
-        .markAsAccepted(any(UUID.class), any(AbstractRequestEvaluatedPayload.class));
+        .markAsAccepted(any(UUID.class), any(RequestEvaluatedPayload.class));
     verify(requestRepository, never())
-        .markAsRejected(any(UUID.class), any(AbstractRequestRejectedPayload.class));
+        .markAsRejected(any(UUID.class), any(RequestRejectedPayload.class));
   }
 
   @Test
@@ -135,13 +135,13 @@ class ReverseRequestUseCaseTest {
 
     useCase.execute(requestId, userId);
 
-    final ArgumentCaptor<AbstractRequestEvaluatedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestEvaluatedPayload.class);
+    final ArgumentCaptor<RequestEvaluatedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestEvaluatedPayload.class);
     verify(requestRepository).read(requestId);
     verify(requestRepository).markAsAccepted(eq(requestId), payloadCaptor.capture());
     verify(requestRepository, never()).markAsNew(any(UUID.class));
     verify(requestRepository, never())
-        .markAsRejected(any(UUID.class), any(AbstractRequestRejectedPayload.class));
+        .markAsRejected(any(UUID.class), any(RequestRejectedPayload.class));
     assertEquals(evaluatedAt, payloadCaptor.getValue().getEvaluatedAt());
     assertEquals(evaluatorId, payloadCaptor.getValue().getEvaluatorId());
   }
@@ -166,13 +166,13 @@ class ReverseRequestUseCaseTest {
 
     useCase.execute(requestId, userId);
 
-    final ArgumentCaptor<AbstractRequestRejectedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestRejectedPayload.class);
+    final ArgumentCaptor<RequestRejectedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestRejectedPayload.class);
     verify(requestRepository).read(requestId);
     verify(requestRepository).markAsRejected(eq(requestId), payloadCaptor.capture());
     verify(requestRepository, never()).markAsNew(any(UUID.class));
     verify(requestRepository, never())
-        .markAsAccepted(any(UUID.class), any(AbstractRequestEvaluatedPayload.class));
+        .markAsAccepted(any(UUID.class), any(RequestEvaluatedPayload.class));
     assertEquals(evaluatedAt, payloadCaptor.getValue().getEvaluatedAt());
     assertEquals(evaluatorId, payloadCaptor.getValue().getEvaluatorId());
     assertEquals(reason, payloadCaptor.getValue().getRejectionReason());
@@ -237,8 +237,8 @@ class ReverseRequestUseCaseTest {
   private void verifyNoReverseOperation() {
     verify(requestRepository, never()).markAsNew(any(UUID.class));
     verify(requestRepository, never())
-        .markAsAccepted(any(UUID.class), any(AbstractRequestEvaluatedPayload.class));
+        .markAsAccepted(any(UUID.class), any(RequestEvaluatedPayload.class));
     verify(requestRepository, never())
-        .markAsRejected(any(UUID.class), any(AbstractRequestRejectedPayload.class));
+        .markAsRejected(any(UUID.class), any(RequestRejectedPayload.class));
   }
 }

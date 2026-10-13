@@ -1,39 +1,39 @@
 package dev.enzosantos.docbox.applications.ports;
 
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestCompletedPayload;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestEvaluatedPayload;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestRejectedPayload;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestReturnedPayload;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestUpdatedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestAcknowledgedPayload;
+import dev.enzosantos.docbox.domain.payloads.RequestCompletedPayload;
+import dev.enzosantos.docbox.domain.payloads.RequestEvaluatedPayload;
+import dev.enzosantos.docbox.domain.payloads.RequestReceivedPayload;
+import dev.enzosantos.docbox.domain.payloads.RequestRejectedPayload;
+import dev.enzosantos.docbox.domain.payloads.RequestReturnedPayload;
+import dev.enzosantos.docbox.domain.payloads.RequestSentPayload;
+import dev.enzosantos.docbox.domain.payloads.RequestUpdatedPayload;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface RequestRepository {
-  void create(AbstractRequest request);
+  void create(Request request);
 
-  Optional<AbstractRequest> read(UUID id);
+  Optional<Request> read(UUID id);
 
-  void update(UUID id, AbstractRequestUpdatedPayload payload);
+  void update(UUID id, RequestUpdatedPayload payload);
 
   void delete(UUID id);
 
   void markAsNew(UUID id);
 
-  void markAsSent(UUID id, AbstractRequestSentPayload payload);
+  void markAsSent(UUID id, RequestSentPayload payload);
 
-  void markAsAcknowledged(UUID id, AbstractRequestAcknowledgedPayload payload);
+  void markAsAcknowledged(UUID id, RequestAcknowledgedPayload payload);
 
-  void markAsAccepted(UUID id, AbstractRequestEvaluatedPayload payload);
+  void markAsAccepted(UUID id, RequestEvaluatedPayload payload);
 
-  void markAsRejected(UUID id, AbstractRequestRejectedPayload payload);
+  void markAsRejected(UUID id, RequestRejectedPayload payload);
 
-  void markAsReturned(UUID id, AbstractRequestReturnedPayload payload);
+  void markAsReturned(UUID id, RequestReturnedPayload payload);
 
-  void markAsReceived(UUID id, AbstractRequestReceivedPayload payload);
+  void markAsReceived(UUID id, RequestReceivedPayload payload);
 
-  void markAsCompleted(UUID id, AbstractRequestCompletedPayload payload);
+  void markAsCompleted(UUID id, RequestCompletedPayload payload);
 }

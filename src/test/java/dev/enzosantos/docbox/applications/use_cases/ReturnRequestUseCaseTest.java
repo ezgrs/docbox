@@ -12,10 +12,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestReturnedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestReturnedPayload;
+import dev.enzosantos.docbox.domain.requests.EvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.ReturnedRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,11 +33,11 @@ class ReturnRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
-  @Mock private AbstractEvaluatedRequest evaluatedRequest;
+  @Mock private EvaluatedRequest evaluatedRequest;
 
-  @Mock private AbstractReturnedRequest returnedRequest;
+  @Mock private ReturnedRequest returnedRequest;
 
-  @Mock private AbstractRequest request;
+  @Mock private Request request;
 
   @InjectMocks private ReturnRequestUseCase useCase;
 
@@ -53,13 +53,13 @@ class ReturnRequestUseCaseTest {
 
     useCase.execute(requestId, userId);
 
-    final ArgumentCaptor<AbstractRequestReturnedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestReturnedPayload.class);
+    final ArgumentCaptor<RequestReturnedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestReturnedPayload.class);
     verify(requestRepository).read(requestId);
     verify(requestRepository).markAsReturned(eq(requestId), payloadCaptor.capture());
     verify(timeProvider).provideInstant();
 
-    final AbstractRequestReturnedPayload payload = payloadCaptor.getValue();
+    final RequestReturnedPayload payload = payloadCaptor.getValue();
     assertEquals(returnedAt, payload.getReturnedAt());
     assertEquals(userId, payload.getReturnerId());
   }
@@ -75,7 +75,7 @@ class ReturnRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsReturned(any(UUID.class), any(AbstractRequestReturnedPayload.class));
+        .markAsReturned(any(UUID.class), any(RequestReturnedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -90,7 +90,7 @@ class ReturnRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsReturned(any(UUID.class), any(AbstractRequestReturnedPayload.class));
+        .markAsReturned(any(UUID.class), any(RequestReturnedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -105,7 +105,7 @@ class ReturnRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsReturned(any(UUID.class), any(AbstractRequestReturnedPayload.class));
+        .markAsReturned(any(UUID.class), any(RequestReturnedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 }

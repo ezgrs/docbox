@@ -12,10 +12,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestRejectedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestRejectedPayload;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.EvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,11 +33,11 @@ class RejectRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
-  @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
+  @Mock private AcknowledgedRequest acknowledgedRequest;
 
-  @Mock private AbstractEvaluatedRequest evaluatedRequest;
+  @Mock private EvaluatedRequest evaluatedRequest;
 
-  @Mock private AbstractRequest request;
+  @Mock private Request request;
 
   @InjectMocks private RejectRequestUseCase useCase;
 
@@ -54,13 +54,13 @@ class RejectRequestUseCaseTest {
 
     useCase.execute(requestId, userId, reason);
 
-    final ArgumentCaptor<AbstractRequestRejectedPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestRejectedPayload.class);
+    final ArgumentCaptor<RequestRejectedPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestRejectedPayload.class);
     verify(requestRepository).read(requestId);
     verify(requestRepository).markAsRejected(eq(requestId), payloadCaptor.capture());
     verify(timeProvider).provideInstant();
 
-    final AbstractRequestRejectedPayload payload = payloadCaptor.getValue();
+    final RequestRejectedPayload payload = payloadCaptor.getValue();
     assertEquals(rejectedAt, payload.getEvaluatedAt());
     assertEquals(userId, payload.getEvaluatorId());
     assertEquals(reason, payload.getRejectionReason());
@@ -79,7 +79,7 @@ class RejectRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsRejected(any(UUID.class), any(AbstractRequestRejectedPayload.class));
+        .markAsRejected(any(UUID.class), any(RequestRejectedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -96,7 +96,7 @@ class RejectRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsRejected(any(UUID.class), any(AbstractRequestRejectedPayload.class));
+        .markAsRejected(any(UUID.class), any(RequestRejectedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -112,7 +112,7 @@ class RejectRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsRejected(any(UUID.class), any(AbstractRequestRejectedPayload.class));
+        .markAsRejected(any(UUID.class), any(RequestRejectedPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 }

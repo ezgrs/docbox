@@ -3,14 +3,14 @@ package dev.enzosantos.docbox.applications.use_cases;
 import dev.enzosantos.docbox.applications.ports.AttachmentRepository;
 import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
-import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
+import dev.enzosantos.docbox.domain.attachments.Attachment;
 import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.EvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 
 
 import java.util.Optional;
@@ -36,25 +36,25 @@ public class RemoveSignatureUseCase {
           RequestNotFoundException,
           InvalidRequestTransitionException,
           UnauthorizedRequestException {
-    final Optional<AbstractAttachment> signatureResult = attachmentRepository.read(id);
+    final Optional<Attachment> signatureResult = attachmentRepository.read(id);
     if (signatureResult.isEmpty()) {
       throw new AttachmentNotFoundException();
     }
 
-    final AbstractAttachment signature = signatureResult.get();
+    final Attachment signature = signatureResult.get();
     if (signature.getOriginalAttachmentId().isEmpty()) {
       throw new InvalidRequestTransitionException();
     }
 
     final UUID requestId = signature.getRequestId();
-    final Optional<AbstractRequest> requestResult = requestRepository.read(requestId);
+    final Optional<Request> requestResult = requestRepository.read(requestId);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
-    if (!(request instanceof AbstractAcknowledgedRequest)
-        || request instanceof AbstractEvaluatedRequest) {
+    final Request request = requestResult.get();
+    if (!(request instanceof AcknowledgedRequest)
+        || request instanceof EvaluatedRequest) {
       throw new InvalidRequestTransitionException();
     }
 

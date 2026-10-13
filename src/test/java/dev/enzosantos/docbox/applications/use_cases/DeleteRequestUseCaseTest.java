@@ -12,10 +12,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestUpdatedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestUpdatedPayload;
+import dev.enzosantos.docbox.domain.requests.CompletedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -29,16 +29,16 @@ class DeleteRequestUseCaseTest {
 
   @Mock private RequestRepository requestRepository;
 
-  @Mock private AbstractRequest request;
+  @Mock private Request request;
 
-  @Mock private AbstractSentRequest sentRequest;
+  @Mock private SentRequest sentRequest;
 
-  @Mock private AbstractCompletedRequest completedRequest;
+  @Mock private CompletedRequest completedRequest;
 
   @InjectMocks private DeleteRequestUseCase useCase;
 
   @Test
-  void shouldDeleteStrictlyAbstractRequest() {
+  void shouldDeleteStrictlyRequest() {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
@@ -104,6 +104,6 @@ class DeleteRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .update(any(UUID.class), any(AbstractRequestUpdatedPayload.class));
+        .update(any(UUID.class), any(RequestUpdatedPayload.class));
   }
 }

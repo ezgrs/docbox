@@ -16,15 +16,15 @@ import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
-import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
+import dev.enzosantos.docbox.domain.attachments.Attachment;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestApproval;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestApproval;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestRejection;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Instant;
@@ -51,17 +51,17 @@ class AddAttachmentUseCaseTest {
 
   @Mock private FileStorage fileStorage;
 
-  @Mock private AbstractRequest draftRequest;
+  @Mock private Request draftRequest;
 
-  @Mock private AbstractReceivedRequest rejectedRequest;
+  @Mock private ReceivedRequest rejectedRequest;
 
-  @Mock private AbstractReceivedRequest approvedRequest;
+  @Mock private ReceivedRequest approvedRequest;
 
-  @Mock private AbstractSentRequest sentRequest;
+  @Mock private SentRequest sentRequest;
 
-  @Mock private AbstractRequestRejection rejection;
+  @Mock private RequestRejection rejection;
 
-  @Mock private AbstractRequestApproval approval;
+  @Mock private RequestApproval approval;
 
   @InjectMocks private AddAttachmentUseCase useCase;
 
@@ -84,15 +84,15 @@ class AddAttachmentUseCaseTest {
 
     useCase.execute(name, stream, requestId, userId);
 
-    final ArgumentCaptor<AbstractAttachment> attachmentCaptor =
-        ArgumentCaptor.forClass(AbstractAttachment.class);
+    final ArgumentCaptor<Attachment> attachmentCaptor =
+        ArgumentCaptor.forClass(Attachment.class);
     final String expectedPath =
         String.format("attachments/%s/original/%s", requestId, attachmentId);
     final InOrder inOrder = inOrder(fileStorage, attachmentRepository);
     inOrder.verify(fileStorage).upload(eq(expectedPath), same(stream));
     inOrder.verify(attachmentRepository).create(attachmentCaptor.capture());
 
-    final AbstractAttachment attachment = attachmentCaptor.getValue();
+    final Attachment attachment = attachmentCaptor.getValue();
     assertEquals(attachmentId, attachment.getId());
     assertEquals(name, attachment.getName());
     assertEquals(requestId, attachment.getRequestId());
@@ -122,7 +122,7 @@ class AddAttachmentUseCaseTest {
     useCase.execute("correction.pdf", stream, requestId, userId);
 
     verify(fileStorage).upload(any(String.class), same(stream));
-    verify(attachmentRepository).create(any(AbstractAttachment.class));
+    verify(attachmentRepository).create(any(Attachment.class));
   }
 
   @Test
@@ -195,6 +195,6 @@ class AddAttachmentUseCaseTest {
     verify(identityProvider, never()).provideUuid();
     verify(timeProvider, never()).provideInstant();
     verify(fileStorage, never()).upload(any(String.class), any(InputStream.class));
-    verify(attachmentRepository, never()).create(any(AbstractAttachment.class));
+    verify(attachmentRepository, never()).create(any(Attachment.class));
   }
 }

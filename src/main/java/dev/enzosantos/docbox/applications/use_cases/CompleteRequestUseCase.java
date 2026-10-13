@@ -4,10 +4,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestCompletedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestCompletedPayload;
+import dev.enzosantos.docbox.domain.requests.CompletedRequest;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,15 +23,15 @@ public class CompleteRequestUseCase {
 
   public void execute(UUID id, UUID userId)
       throws RequestNotFoundException, InvalidRequestTransitionException {
-    final Optional<AbstractRequest> requestResult = requestRepository.read(id);
+    final Optional<Request> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
+    final Request request = requestResult.get();
     final boolean isStrictlyReceived =
-        request instanceof AbstractReceivedRequest
-            && !(request instanceof AbstractCompletedRequest);
+        request instanceof ReceivedRequest
+            && !(request instanceof CompletedRequest);
     if (!isStrictlyReceived) {
       throw new InvalidRequestTransitionException();
     }
@@ -39,7 +39,7 @@ public class CompleteRequestUseCase {
     final Instant completedAt = timeProvider.provideInstant();
     requestRepository.markAsCompleted(
         id,
-        new AbstractRequestCompletedPayload() {
+        new RequestCompletedPayload() {
 
           @Override
           public Instant getCompletedAt() {

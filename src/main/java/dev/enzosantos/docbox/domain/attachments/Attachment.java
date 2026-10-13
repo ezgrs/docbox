@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AbstractAttachment {
+public interface Attachment {
   UUID getId();
 
   String getName();

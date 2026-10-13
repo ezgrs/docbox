@@ -12,13 +12,13 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestEvaluation;
-import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestSentPayload;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestEvaluation;
+import dev.enzosantos.docbox.domain.request_evaluations.RequestRejection;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.ReceivedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,15 +37,15 @@ class SendRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
-  @Mock private AbstractRequest request;
+  @Mock private Request request;
 
-  @Mock private AbstractSentRequest sentRequest;
+  @Mock private SentRequest sentRequest;
 
-  @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
+  @Mock private AcknowledgedRequest acknowledgedRequest;
 
-  @Mock private AbstractReceivedRequest receivedRequest;
+  @Mock private ReceivedRequest receivedRequest;
 
-  @Mock private AbstractRequestEvaluation evaluation;
+  @Mock private RequestEvaluation evaluation;
 
   @InjectMocks private SendRequestUseCase useCase;
 
@@ -61,13 +61,13 @@ class SendRequestUseCaseTest {
 
     useCase.execute(requestId, userId);
 
-    final ArgumentCaptor<AbstractRequestSentPayload> payloadCaptor =
-        ArgumentCaptor.forClass(AbstractRequestSentPayload.class);
+    final ArgumentCaptor<RequestSentPayload> payloadCaptor =
+        ArgumentCaptor.forClass(RequestSentPayload.class);
     verify(requestRepository).markAsSent(eq(requestId), payloadCaptor.capture());
     verify(requestRepository).read(requestId);
     verify(timeProvider).provideInstant();
 
-    final AbstractRequestSentPayload payload = payloadCaptor.getValue();
+    final RequestSentPayload payload = payloadCaptor.getValue();
     assertEquals(sentAt, payload.getSentAt());
     assertEquals(userId, payload.getSenderId());
   }
@@ -83,7 +83,7 @@ class SendRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsSent(any(UUID.class), any(AbstractRequestSentPayload.class));
+        .markAsSent(any(UUID.class), any(RequestSentPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -98,7 +98,7 @@ class SendRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsSent(any(UUID.class), any(AbstractRequestSentPayload.class));
+        .markAsSent(any(UUID.class), any(RequestSentPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -108,10 +108,10 @@ class SendRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
     final Instant sentAt = Instant.parse("2026-10-12T13:00:00Z");
-    final AbstractRequestEvaluation rejection =
+    final RequestEvaluation rejection =
         Mockito.mock(
-            AbstractRequestEvaluation.class,
-            Mockito.withSettings().extraInterfaces(AbstractRequestRejection.class));
+            RequestEvaluation.class,
+            Mockito.withSettings().extraInterfaces(RequestRejection.class));
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(receivedRequest));
     when(receivedRequest.getEvaluation()).thenReturn(rejection);
@@ -120,7 +120,7 @@ class SendRequestUseCaseTest {
     useCase.execute(requestId, userId);
 
     verify(requestRepository).read(requestId);
-    verify(requestRepository).markAsSent(eq(requestId), any(AbstractRequestSentPayload.class));
+    verify(requestRepository).markAsSent(eq(requestId), any(RequestSentPayload.class));
     verify(timeProvider).provideInstant();
   }
 
@@ -136,7 +136,7 @@ class SendRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsSent(any(UUID.class), any(AbstractRequestSentPayload.class));
+        .markAsSent(any(UUID.class), any(RequestSentPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 
@@ -151,7 +151,7 @@ class SendRequestUseCaseTest {
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
-        .markAsSent(any(UUID.class), any(AbstractRequestSentPayload.class));
+        .markAsSent(any(UUID.class), any(RequestSentPayload.class));
     verify(timeProvider, never()).provideInstant();
   }
 }

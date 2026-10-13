@@ -4,8 +4,8 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.SentRequest;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,13 +20,13 @@ public class DeleteRequestUseCase {
       throws RequestNotFoundException,
           UnauthorizedRequestException,
           InvalidRequestTransitionException {
-    final Optional<AbstractRequest> requestResult = requestRepository.read(id);
+    final Optional<Request> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
-    if (request instanceof AbstractSentRequest) {
+    final Request request = requestResult.get();
+    if (request instanceof SentRequest) {
       throw new InvalidRequestTransitionException();
     }
 

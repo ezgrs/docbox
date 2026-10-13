@@ -4,10 +4,10 @@ import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
-import dev.enzosantos.docbox.domain.payloads.AbstractRequestReturnedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractReturnedRequest;
+import dev.enzosantos.docbox.domain.payloads.RequestReturnedPayload;
+import dev.enzosantos.docbox.domain.requests.EvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
+import dev.enzosantos.docbox.domain.requests.ReturnedRequest;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,15 +23,15 @@ public class ReturnRequestUseCase {
 
   public void execute(UUID id, UUID userId)
       throws RequestNotFoundException, InvalidRequestTransitionException {
-    final Optional<AbstractRequest> requestResult = requestRepository.read(id);
+    final Optional<Request> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
       throw new RequestNotFoundException();
     }
 
-    final AbstractRequest request = requestResult.get();
+    final Request request = requestResult.get();
     final boolean isStrictlyEvaluated =
-        request instanceof AbstractEvaluatedRequest
-            && !(request instanceof AbstractReturnedRequest);
+        request instanceof EvaluatedRequest
+            && !(request instanceof ReturnedRequest);
     if (!isStrictlyEvaluated) {
       throw new InvalidRequestTransitionException();
     }
@@ -39,7 +39,7 @@ public class ReturnRequestUseCase {
     final Instant returnedAt = timeProvider.provideInstant();
     requestRepository.markAsReturned(
         id,
-        new AbstractRequestReturnedPayload() {
+        new RequestReturnedPayload() {
 
           @Override
           public Instant getReturnedAt() {

@@ -13,14 +13,14 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.AttachmentRepository;
 import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
-import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
+import dev.enzosantos.docbox.domain.attachments.Attachment;
 import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
-import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.AcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.EvaluatedRequest;
+import dev.enzosantos.docbox.domain.requests.Request;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -39,13 +39,13 @@ class RemoveSignatureUseCaseTest {
 
   @Mock private FileStorage fileStorage;
 
-  @Mock private AbstractAttachment signature;
+  @Mock private Attachment signature;
 
-  @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
+  @Mock private AcknowledgedRequest acknowledgedRequest;
 
-  @Mock private AbstractEvaluatedRequest evaluatedRequest;
+  @Mock private EvaluatedRequest evaluatedRequest;
 
-  @Mock private AbstractRequest unacknowledgedRequest;
+  @Mock private Request unacknowledgedRequest;
 
   @InjectMocks private RemoveSignatureUseCase useCase;
 
@@ -144,7 +144,7 @@ class RemoveSignatureUseCaseTest {
     verifyNoDeletion();
   }
 
-  private void assertRejectsForRequest(AbstractRequest request) {
+  private void assertRejectsForRequest(Request request) {
     final UUID signatureId = UUID.randomUUID();
     final UUID requestId = UUID.randomUUID();
     final UUID originalId = UUID.randomUUID();
