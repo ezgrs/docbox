@@ -21,7 +21,7 @@ public class UpdateRequestUseCase {
     this.timeProvider = timeProvider;
   }
 
-  public void execute(UUID id, String name, Optional<String> description, String userId)
+  public void execute(UUID id, String name, Optional<String> description, UUID userId)
       throws RequestNotFoundException,
           InvalidRequestTransitionException,
           UnauthorizedRequestException {

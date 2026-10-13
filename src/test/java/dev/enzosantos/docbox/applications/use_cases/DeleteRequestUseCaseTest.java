@@ -40,11 +40,12 @@ class DeleteRequestUseCaseTest {
   @Test
   void shouldDeleteStrictlyAbstractRequest() {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
-    when(request.getCreatorId()).thenReturn("creator-id");
+    when(request.getCreatorId()).thenReturn(userId);
 
-    assertDoesNotThrow(() -> useCase.execute(requestId, "creator-id"));
+    assertDoesNotThrow(() -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository).delete(eq(requestId));
@@ -53,11 +54,11 @@ class DeleteRequestUseCaseTest {
   @Test
   void shouldRejectDeletingSentRequest() {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(sentRequest));
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, "creator-id"));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
@@ -66,11 +67,11 @@ class DeleteRequestUseCaseTest {
   @Test
   void shouldRejectDeletingCompletedRequest() {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(completedRequest));
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, "creator-id"));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
@@ -79,10 +80,11 @@ class DeleteRequestUseCaseTest {
   @Test
   void shouldRejectDeletingRequestThatDoesNotExist() {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
-    assertThrows(RequestNotFoundException.class, () -> useCase.execute(requestId, "creator-id"));
+    assertThrows(RequestNotFoundException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
@@ -92,12 +94,13 @@ class DeleteRequestUseCaseTest {
   void shouldRejectUpdatingRequestByAnotherUser()
       throws InvalidRequestTransitionException, UnauthorizedRequestException {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
-    when(request.getCreatorId()).thenReturn("creator-id");
+    when(request.getCreatorId()).thenReturn(userId);
 
     assertThrows(
-        UnauthorizedRequestException.class, () -> useCase.execute(requestId, "another-user"));
+        UnauthorizedRequestException.class, () -> useCase.execute(requestId, UUID.randomUUID()));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())

@@ -50,7 +50,7 @@ class UpdateRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final String name = "Updated request";
     final Optional<String> description = Optional.of("Updated description");
-    final String userId = "creator-id";
+    final UUID userId = UUID.randomUUID();
     final Instant updatedAt = Instant.parse("2026-10-13T12:00:00Z");
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
@@ -79,7 +79,7 @@ class UpdateRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final String name = "Updated request";
     final Optional<String> description = Optional.empty();
-    final String userId = "creator-id";
+    final UUID userId = UUID.randomUUID();
     final Instant updatedAt = Instant.parse("2026-10-13T12:00:00Z");
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
@@ -99,12 +99,13 @@ class UpdateRequestUseCaseTest {
   @Test
   void shouldRejectUpdatingRequestThatDoesNotExist() {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
     assertThrows(
         RequestNotFoundException.class,
-        () -> useCase.execute(requestId, "Updated request", Optional.empty(), "creator-id"));
+        () -> useCase.execute(requestId, "Updated request", Optional.empty(), userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
@@ -115,12 +116,13 @@ class UpdateRequestUseCaseTest {
   @Test
   void shouldRejectUpdatingSentRequest() {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(sentRequest));
 
     assertThrows(
         InvalidRequestTransitionException.class,
-        () -> useCase.execute(requestId, "Updated request", Optional.empty(), "creator-id"));
+        () -> useCase.execute(requestId, "Updated request", Optional.empty(), userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
@@ -131,12 +133,13 @@ class UpdateRequestUseCaseTest {
   @Test
   void shouldRejectUpdatingCompletedRequest() {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(completedRequest));
 
     assertThrows(
         InvalidRequestTransitionException.class,
-        () -> useCase.execute(requestId, "Updated request", Optional.empty(), "creator-id"));
+        () -> useCase.execute(requestId, "Updated request", Optional.empty(), userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
@@ -148,13 +151,14 @@ class UpdateRequestUseCaseTest {
   void shouldRejectUpdatingRequestByAnotherUser()
       throws InvalidRequestTransitionException, UnauthorizedRequestException {
     final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
-    when(request.getCreatorId()).thenReturn("creator-id");
+    when(request.getCreatorId()).thenReturn(userId);
 
     assertThrows(
         UnauthorizedRequestException.class,
-        () -> useCase.execute(requestId, "Updated request", Optional.empty(), "another-user"));
+        () -> useCase.execute(requestId, "Updated request", Optional.empty(), UUID.randomUUID()));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())

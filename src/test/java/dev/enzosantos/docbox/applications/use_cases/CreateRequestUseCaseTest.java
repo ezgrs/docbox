@@ -35,7 +35,7 @@ class CreateRequestUseCaseTest {
     final Instant createdAt = Instant.parse("2026-10-12T00:00:00Z");
     final String name = "Document request 1";
     final Optional<String> description = Optional.empty();
-    final String userId = "user-123";
+    final UUID userId = UUID.randomUUID();
 
     when(identityProvider.provideUuid()).thenReturn(id);
     when(timeProvider.provideInstant()).thenReturn(createdAt);
@@ -63,7 +63,7 @@ class CreateRequestUseCaseTest {
     final Instant createdAt = Instant.parse("2026-10-12T12:00:00Z");
     final String name = "Document request 2";
     final Optional<String> description = Optional.of("Request description");
-    final String userId = "user-456";
+    final UUID userId = UUID.randomUUID();
 
     when(identityProvider.provideUuid()).thenReturn(id);
     when(timeProvider.provideInstant()).thenReturn(createdAt);

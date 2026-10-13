@@ -16,7 +16,7 @@ public class DeleteRequestUseCase {
     this.requestRepository = requestRepository;
   }
 
-  public void execute(UUID id, String userId)
+  public void execute(UUID id, UUID userId)
       throws RequestNotFoundException,
           UnauthorizedRequestException,
           InvalidRequestTransitionException {

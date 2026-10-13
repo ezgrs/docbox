@@ -15,5 +15,5 @@ public interface AbstractRequest {
 
   Instant getUpdatedAt();
 
-  String getCreatorId();
+  UUID getCreatorId();
 }

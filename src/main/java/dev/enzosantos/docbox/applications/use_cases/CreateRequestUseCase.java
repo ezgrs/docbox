@@ -22,7 +22,7 @@ public class CreateRequestUseCase {
     this.timeProvider = timeProvider;
   }
 
-  public void execute(String name, Optional<String> description, String userId) {
+  public void execute(String name, Optional<String> description, UUID userId) {
     final UUID id = identityProvider.provideUuid();
     final Instant createdAt = timeProvider.provideInstant();
     this.requestRepository.create(
@@ -53,7 +53,7 @@ public class CreateRequestUseCase {
           }
 
           @Override
-          public String getCreatorId() {
+          public UUID getCreatorId() {
             return userId;
           }
         });
