@@ -15,6 +15,7 @@ import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
 import dev.enzosantos.docbox.domain.attachments.AttachmentType;
+import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
@@ -100,7 +101,7 @@ class RemoveAttachmentUseCaseTest {
 
     when(attachmentRepository.read(attachmentId)).thenReturn(Optional.empty());
 
-    assertThrows(RequestNotFoundException.class, () -> useCase.execute(attachmentId, userId));
+    assertThrows(AttachmentNotFoundException.class, () -> useCase.execute(attachmentId, userId));
 
     verify(attachmentRepository).read(attachmentId);
     verifyNoRemoval();

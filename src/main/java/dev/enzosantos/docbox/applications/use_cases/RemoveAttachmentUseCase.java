@@ -5,6 +5,7 @@ import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
 import dev.enzosantos.docbox.domain.attachments.AttachmentType;
+import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
@@ -31,12 +32,13 @@ public class RemoveAttachmentUseCase {
   }
 
   public void execute(UUID id, UUID userId)
-      throws RequestNotFoundException,
+      throws AttachmentNotFoundException,
+          RequestNotFoundException,
           InvalidRequestTransitionException,
           UnauthorizedRequestException {
     final Optional<AbstractAttachment> attachmentResult = attachmentRepository.read(id);
     if (attachmentResult.isEmpty()) {
-      throw new RequestNotFoundException();
+      throw new AttachmentNotFoundException();
     }
 
     final AbstractAttachment attachment = attachmentResult.get();
