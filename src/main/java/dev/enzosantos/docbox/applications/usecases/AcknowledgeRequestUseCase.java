@@ -6,6 +6,8 @@ import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -21,6 +23,9 @@ public class AcknowledgeRequestUseCase {
   public void execute(UUID id, UUID userId) throws InvalidRequestTransitionException {
     final AbstractRequest request = requestRepository.read(id);
     if (request instanceof AbstractAcknowledgedRequest) {
+      throw new InvalidRequestTransitionException();
+    }
+    if (!(request instanceof AbstractSentRequest)) {
       throw new InvalidRequestTransitionException();
     }
 

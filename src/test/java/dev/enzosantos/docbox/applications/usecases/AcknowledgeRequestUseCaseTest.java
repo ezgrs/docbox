@@ -14,6 +14,7 @@ import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
+import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,8 @@ class AcknowledgeRequestUseCaseTest {
 
   @Mock private AbstractRequest request;
 
+  @Mock private AbstractSentRequest sentRequest;
+
   @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
 
   @InjectMocks private AcknowledgeRequestUseCase useCase;
@@ -43,7 +46,7 @@ class AcknowledgeRequestUseCaseTest {
     final UUID userId = UUID.randomUUID();
     final Instant acknowledgedAt = Instant.parse("2026-10-12T12:00:00Z");
 
-    when(requestRepository.read(requestId)).thenReturn(request);
+    when(requestRepository.read(requestId)).thenReturn(sentRequest);
     when(timeProvider.provideInstant()).thenReturn(acknowledgedAt);
 
     useCase.execute(requestId, userId);
@@ -67,6 +70,22 @@ class AcknowledgeRequestUseCaseTest {
     when(requestRepository.read(requestId)).thenReturn(acknowledgedRequest);
 
     assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+
+    verify(requestRepository).read(requestId);
+    verify(requestRepository, never())
+        .markAsAcknowledged(any(UUID.class), any(AbstractRequestAcknowledgedPayload.class));
+    verify(timeProvider, never()).provideInstant();
+  }
+
+  @Test
+  void shouldRejectAcknowledgingRequestThatWasNotSent() {
+    final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
+
+    when(requestRepository.read(requestId)).thenReturn(request);
+
+    assertThrows(
+        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
