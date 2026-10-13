@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
+import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestUpdatedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
@@ -43,7 +44,9 @@ class UpdateRequestUseCaseTest {
 
   @Test
   void shouldUpdateRequestNameAndDescriptionForItsCreator()
-      throws InvalidRequestTransitionException, UnauthorizedRequestException {
+      throws RequestNotFoundException,
+          InvalidRequestTransitionException,
+          UnauthorizedRequestException {
     final UUID requestId = UUID.randomUUID();
     final String name = "Updated request";
     final Optional<String> description = Optional.of("Updated description");
@@ -70,7 +73,9 @@ class UpdateRequestUseCaseTest {
 
   @Test
   void shouldUpdateRequestWithoutDescription()
-      throws InvalidRequestTransitionException, UnauthorizedRequestException {
+      throws RequestNotFoundException,
+          InvalidRequestTransitionException,
+          UnauthorizedRequestException {
     final UUID requestId = UUID.randomUUID();
     final String name = "Updated request";
     final Optional<String> description = Optional.empty();
@@ -98,7 +103,7 @@ class UpdateRequestUseCaseTest {
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
     assertThrows(
-        InvalidRequestTransitionException.class,
+        RequestNotFoundException.class,
         () -> useCase.execute(requestId, "Updated request", Optional.empty(), "creator-id"));
 
     verify(requestRepository).read(requestId);

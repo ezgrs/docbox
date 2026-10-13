@@ -3,6 +3,7 @@ package dev.enzosantos.docbox.applications.use_cases;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
+import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
@@ -20,10 +21,11 @@ public class AcknowledgeRequestUseCase {
     this.timeProvider = timeProvider;
   }
 
-  public void execute(UUID id, UUID userId) throws InvalidRequestTransitionException {
+  public void execute(UUID id, UUID userId)
+      throws RequestNotFoundException, InvalidRequestTransitionException {
     final Optional<AbstractRequest> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
-      throw new InvalidRequestTransitionException();
+      throw new RequestNotFoundException();
     }
 
     final AbstractRequest request = requestResult.get();

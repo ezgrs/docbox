@@ -3,7 +3,7 @@ package dev.enzosantos.docbox.applications.use_cases;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
+import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
@@ -42,7 +43,7 @@ class ReceiveRequestUseCaseTest {
 
   @Test
   void shouldMarkReturnedRequestAsReceivedWithProvidedValues()
-      throws InvalidRequestTransitionException {
+      throws RequestNotFoundException, InvalidRequestTransitionException {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
     final Instant receivedAt = Instant.parse("2026-10-12T12:00:00Z");
@@ -100,7 +101,7 @@ class ReceiveRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
-    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+    assertThrows(RequestNotFoundException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())

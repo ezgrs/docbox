@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
+import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
 import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestEvaluation;
 import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
@@ -49,7 +50,8 @@ class SendRequestUseCaseTest {
   @InjectMocks private SendRequestUseCase useCase;
 
   @Test
-  void shouldMarkRequestAsSentWithProvidedValues() throws InvalidRequestTransitionException {
+  void shouldMarkRequestAsSentWithProvidedValues()
+      throws RequestNotFoundException, InvalidRequestTransitionException {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
     final Instant sentAt = Instant.parse("2026-10-12T12:00:00Z");
@@ -101,7 +103,8 @@ class SendRequestUseCaseTest {
   }
 
   @Test
-  void shouldAllowResendingRejectedRequest() throws InvalidRequestTransitionException {
+  void shouldAllowResendingRejectedRequest()
+      throws RequestNotFoundException, InvalidRequestTransitionException {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
     final Instant sentAt = Instant.parse("2026-10-12T13:00:00Z");
@@ -144,7 +147,7 @@ class SendRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
-    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+    assertThrows(RequestNotFoundException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())

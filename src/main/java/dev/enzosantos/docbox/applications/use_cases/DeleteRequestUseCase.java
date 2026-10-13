@@ -2,6 +2,7 @@ package dev.enzosantos.docbox.applications.use_cases;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
+import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.util.Optional;
@@ -14,10 +15,10 @@ public class DeleteRequestUseCase {
     this.requestRepository = requestRepository;
   }
 
-  public void execute(UUID id) throws InvalidRequestTransitionException {
+  public void execute(UUID id) throws RequestNotFoundException, InvalidRequestTransitionException {
     final Optional<AbstractRequest> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
-      throw new InvalidRequestTransitionException();
+      throw new RequestNotFoundException();
     }
 
     final AbstractRequest request = requestResult.get();

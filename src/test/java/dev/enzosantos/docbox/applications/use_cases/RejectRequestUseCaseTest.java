@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
+import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestRejectedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
@@ -42,7 +43,7 @@ class RejectRequestUseCaseTest {
 
   @Test
   void shouldMarkAcknowledgedRequestAsRejectedWithProvidedValues()
-      throws InvalidRequestTransitionException {
+      throws RequestNotFoundException, InvalidRequestTransitionException {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
     final Instant rejectedAt = Instant.parse("2026-10-12T12:00:00Z");
@@ -107,8 +108,7 @@ class RejectRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId, reason));
+    assertThrows(RequestNotFoundException.class, () -> useCase.execute(requestId, userId, reason));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())

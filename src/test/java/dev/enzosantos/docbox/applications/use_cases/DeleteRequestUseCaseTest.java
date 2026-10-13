@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
+import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
@@ -76,7 +77,7 @@ class DeleteRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
-    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
+    assertThrows(RequestNotFoundException.class, () -> useCase.execute(requestId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));

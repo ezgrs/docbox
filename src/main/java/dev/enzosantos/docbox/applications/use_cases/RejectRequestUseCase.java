@@ -3,6 +3,7 @@ package dev.enzosantos.docbox.applications.use_cases;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
+import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestRejectedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
@@ -21,10 +22,10 @@ public class RejectRequestUseCase {
   }
 
   public void execute(UUID id, UUID userId, String reason)
-      throws InvalidRequestTransitionException {
+      throws RequestNotFoundException, InvalidRequestTransitionException {
     final Optional<AbstractRequest> requestResult = requestRepository.read(id);
     if (requestResult.isEmpty()) {
-      throw new InvalidRequestTransitionException();
+      throw new RequestNotFoundException();
     }
 
     final AbstractRequest request = requestResult.get();
