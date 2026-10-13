@@ -2,7 +2,7 @@ package dev.enzosantos.docbox.domain.requests;
 
 import java.time.Instant;
 
-public interface AbstractReturnedRequest extends AbstractEvaluatedRequest {
+public interface AbstractReturnedRequest {
   Instant getReturnedAt();
 
   String getReturnerId();
