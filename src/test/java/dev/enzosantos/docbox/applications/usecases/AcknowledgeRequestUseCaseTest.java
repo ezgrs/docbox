@@ -1,13 +1,19 @@
 package dev.enzosantos.docbox.applications.usecases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
+import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
+import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
+import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -24,25 +30,47 @@ class AcknowledgeRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
+  @Mock private AbstractRequest request;
+
+  @Mock private AbstractAcknowledgedRequest acknowledgedRequest;
+
   @InjectMocks private AcknowledgeRequestUseCase useCase;
 
   @Test
-  void shouldMarkRequestAsAcknowledgedWithProvidedValues() {
+  void shouldMarkRequestAsAcknowledgedWithProvidedValues()
+      throws InvalidRequestTransitionException {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
     final Instant acknowledgedAt = Instant.parse("2026-10-12T12:00:00Z");
 
+    when(requestRepository.read(requestId)).thenReturn(request);
     when(timeProvider.provideInstant()).thenReturn(acknowledgedAt);
 
     useCase.execute(requestId, userId);
 
     final ArgumentCaptor<AbstractRequestAcknowledgedPayload> payloadCaptor =
         ArgumentCaptor.forClass(AbstractRequestAcknowledgedPayload.class);
+    verify(requestRepository).read(requestId);
     verify(requestRepository).markAsAcknowledged(eq(requestId), payloadCaptor.capture());
     verify(timeProvider).provideInstant();
 
     final AbstractRequestAcknowledgedPayload payload = payloadCaptor.getValue();
     assertEquals(acknowledgedAt, payload.getAcknowledgedAt());
     assertEquals(userId, payload.getAcknowledgerId());
+  }
+
+  @Test
+  void shouldRejectAcknowledgingAlreadyAcknowledgedRequest() {
+    final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
+
+    when(requestRepository.read(requestId)).thenReturn(acknowledgedRequest);
+
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+
+    verify(requestRepository).read(requestId);
+    verify(requestRepository, never())
+        .markAsAcknowledged(any(UUID.class), any(AbstractRequestAcknowledgedPayload.class));
+    verify(timeProvider, never()).provideInstant();
   }
 }
