@@ -48,6 +48,11 @@ public class CreateRequestUseCase {
           }
 
           @Override
+          public Instant getUpdatedAt() {
+            return createdAt;
+          }
+
+          @Override
           public String getCreatorId() {
             return userId;
           }

@@ -53,6 +53,7 @@ class CreateRequestUseCaseTest {
     assertEquals(name, request.getName());
     assertEquals(description, request.getDescription());
     assertEquals(createdAt, request.getCreatedAt());
+    assertEquals(createdAt, request.getUpdatedAt());
     assertEquals(userId, request.getCreatorId());
   }
 
@@ -80,6 +81,7 @@ class CreateRequestUseCaseTest {
     assertEquals(name, request.getName());
     assertEquals(description, request.getDescription());
     assertEquals(createdAt, request.getCreatedAt());
+    assertEquals(createdAt, request.getUpdatedAt());
     assertEquals(userId, request.getCreatorId());
   }
 }

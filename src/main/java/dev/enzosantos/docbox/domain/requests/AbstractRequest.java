@@ -13,5 +13,7 @@ public interface AbstractRequest {
 
   Instant getCreatedAt();
 
+  Instant getUpdatedAt();
+
   String getCreatorId();
 }
