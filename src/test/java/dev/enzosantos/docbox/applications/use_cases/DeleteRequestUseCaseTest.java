@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
+import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestUpdatedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractCompletedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
@@ -40,8 +42,9 @@ class DeleteRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
+    when(request.getCreatorId()).thenReturn("creator-id");
 
-    assertDoesNotThrow(() -> useCase.execute(requestId));
+    assertDoesNotThrow(() -> useCase.execute(requestId, "creator-id"));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository).delete(eq(requestId));
@@ -53,7 +56,8 @@ class DeleteRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(sentRequest));
 
-    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
+    assertThrows(
+        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, "creator-id"));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
@@ -65,7 +69,8 @@ class DeleteRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.of(completedRequest));
 
-    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId));
+    assertThrows(
+        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, "creator-id"));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
@@ -77,9 +82,25 @@ class DeleteRequestUseCaseTest {
 
     when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
-    assertThrows(RequestNotFoundException.class, () -> useCase.execute(requestId));
+    assertThrows(RequestNotFoundException.class, () -> useCase.execute(requestId, "creator-id"));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never()).delete(any(UUID.class));
+  }
+
+  @Test
+  void shouldRejectUpdatingRequestByAnotherUser()
+      throws InvalidRequestTransitionException, UnauthorizedRequestException {
+    final UUID requestId = UUID.randomUUID();
+
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
+    when(request.getCreatorId()).thenReturn("creator-id");
+
+    assertThrows(
+        UnauthorizedRequestException.class, () -> useCase.execute(requestId, "another-user"));
+
+    verify(requestRepository).read(requestId);
+    verify(requestRepository, never())
+        .update(any(UUID.class), any(AbstractRequestUpdatedPayload.class));
   }
 }
