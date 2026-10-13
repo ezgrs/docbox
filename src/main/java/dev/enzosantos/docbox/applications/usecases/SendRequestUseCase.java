@@ -5,7 +5,6 @@ import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
 import dev.enzosantos.docbox.domain.request_evaluations.AbstractRequestRejection;
-import dev.enzosantos.docbox.domain.requests.AbstractEvaluatedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
@@ -29,11 +28,12 @@ public class SendRequestUseCase {
     }
 
     final AbstractRequest request = requestResult.get();
-    if (request instanceof AbstractReceivedRequest
-        && ((AbstractEvaluatedRequest) request).getEvaluation()
-            instanceof AbstractRequestRejection) {
+    final boolean isRejectedReceivedRequest =
+        request instanceof AbstractReceivedRequest receivedRequest
+            && receivedRequest.getEvaluation() instanceof AbstractRequestRejection;
+    final boolean isInitialRequest = !(request instanceof AbstractSentRequest);
 
-    } else if (request instanceof AbstractSentRequest) {
+    if (!isInitialRequest && !isRejectedReceivedRequest) {
       throw new InvalidRequestTransitionException();
     }
 
