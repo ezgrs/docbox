@@ -5,6 +5,7 @@ import dev.enzosantos.docbox.domain.requests.AbstractRequestAcknowledgedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequestCompletedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequestEvaluatedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequestRejectedPayload;
+import dev.enzosantos.docbox.domain.requests.AbstractRequestReturnedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequestSentPayload;
 import java.util.UUID;
 
@@ -20,4 +21,6 @@ public interface RequestRepository {
   void markAsRejected(UUID id, AbstractRequestRejectedPayload payload);
 
   void markAsCompleted(UUID id, AbstractRequestCompletedPayload payload);
+
+  void markAsReturned(UUID id, AbstractRequestReturnedPayload payload);
 }
