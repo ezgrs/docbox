@@ -1,13 +1,13 @@
 package dev.enzosantos.docbox.applications.ports;
 
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestAcknowledgedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestCompletedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestEvaluatedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestRejectedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestReturnedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestSentPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestAcknowledgedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestCompletedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestEvaluatedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestReceivedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestRejectedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestReturnedPayload;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestSentPayload;
 import java.util.UUID;
 
 public interface RequestRepository {

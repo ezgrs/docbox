@@ -1,4 +1,4 @@
-package dev.enzosantos.docbox.domain.requests;
+package dev.enzosantos.docbox.domain.payloads;
 
 public interface AbstractRequestRejectedPayload extends AbstractRequestEvaluatedPayload {
   String getRejectionReason();

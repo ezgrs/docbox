@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestReceivedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestReceivedPayload;
 import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

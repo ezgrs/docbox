@@ -2,7 +2,7 @@ package dev.enzosantos.docbox.applications.usecases;
 
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
-import dev.enzosantos.docbox.domain.requests.AbstractRequestCompletedPayload;
+import dev.enzosantos.docbox.domain.payloads.AbstractRequestCompletedPayload;
 import java.time.Instant;
 import java.util.UUID;
 
