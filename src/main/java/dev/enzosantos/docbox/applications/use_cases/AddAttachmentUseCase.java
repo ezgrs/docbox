@@ -6,7 +6,6 @@ import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
-import dev.enzosantos.docbox.domain.attachments.AttachmentType;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
@@ -97,8 +96,8 @@ public class AddAttachmentUseCase {
           }
 
           @Override
-          public AttachmentType getType() {
-            return AttachmentType.ORIGINAL;
+          public Optional<UUID> getOriginalAttachmentId() {
+            return Optional.empty();
           }
         });
   }

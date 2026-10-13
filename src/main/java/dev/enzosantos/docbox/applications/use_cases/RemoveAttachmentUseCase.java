@@ -4,7 +4,6 @@ import dev.enzosantos.docbox.applications.ports.AttachmentRepository;
 import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
-import dev.enzosantos.docbox.domain.attachments.AttachmentType;
 import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
@@ -44,7 +43,7 @@ public class RemoveAttachmentUseCase {
     final AbstractAttachment attachment = attachmentResult.get();
 
     // Permite apenas anexos originais
-    if (attachment.getType() != AttachmentType.ORIGINAL) {
+    if (attachment.getOriginalAttachmentId().isPresent()) {
       throw new InvalidRequestTransitionException();
     }
 

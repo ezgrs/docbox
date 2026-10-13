@@ -14,7 +14,6 @@ import dev.enzosantos.docbox.applications.ports.AttachmentRepository;
 import dev.enzosantos.docbox.applications.ports.FileStorage;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
-import dev.enzosantos.docbox.domain.attachments.AttachmentType;
 import dev.enzosantos.docbox.domain.exceptions.AttachmentNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
@@ -129,7 +128,7 @@ class RemoveAttachmentUseCaseTest {
     final UUID attachmentId = UUID.randomUUID();
 
     when(attachmentRepository.read(attachmentId)).thenReturn(Optional.of(attachment));
-    when(attachment.getType()).thenReturn(AttachmentType.SIGNED);
+    when(attachment.getOriginalAttachmentId()).thenReturn(Optional.of(UUID.randomUUID()));
 
     assertThrows(
         InvalidRequestTransitionException.class,
@@ -189,7 +188,7 @@ class RemoveAttachmentUseCaseTest {
 
   private void stubOriginalAttachment(UUID requestId) {
     when(attachment.getRequestId()).thenReturn(requestId);
-    when(attachment.getType()).thenReturn(AttachmentType.ORIGINAL);
+    when(attachment.getOriginalAttachmentId()).thenReturn(Optional.empty());
   }
 
   private void verifyRemovalInOrder(UUID attachmentId, UUID requestId) {

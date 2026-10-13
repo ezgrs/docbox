@@ -1,6 +1,7 @@
 package dev.enzosantos.docbox.domain.attachments;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface AbstractAttachment {
@@ -14,5 +15,5 @@ public interface AbstractAttachment {
 
   UUID getCreatorId();
 
-  AttachmentType getType();
+  Optional<UUID> getOriginalAttachmentId();
 }

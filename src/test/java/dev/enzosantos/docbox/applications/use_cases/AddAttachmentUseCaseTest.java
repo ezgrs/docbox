@@ -2,6 +2,7 @@ package dev.enzosantos.docbox.applications.use_cases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -16,7 +17,6 @@ import dev.enzosantos.docbox.applications.ports.IdentityProvider;
 import dev.enzosantos.docbox.applications.ports.RequestRepository;
 import dev.enzosantos.docbox.applications.ports.TimeProvider;
 import dev.enzosantos.docbox.domain.attachments.AbstractAttachment;
-import dev.enzosantos.docbox.domain.attachments.AttachmentType;
 import dev.enzosantos.docbox.domain.exceptions.InvalidRequestTransitionException;
 import dev.enzosantos.docbox.domain.exceptions.RequestNotFoundException;
 import dev.enzosantos.docbox.domain.exceptions.UnauthorizedRequestException;
@@ -98,7 +98,7 @@ class AddAttachmentUseCaseTest {
     assertEquals(requestId, attachment.getRequestId());
     assertEquals(createdAt, attachment.getCreatedAt());
     assertEquals(userId, attachment.getCreatorId());
-    assertEquals(AttachmentType.ORIGINAL, attachment.getType());
+    assertTrue(attachment.getOriginalAttachmentId().isEmpty());
     verify(requestRepository).read(requestId);
     verify(identityProvider).provideUuid();
     verify(timeProvider).provideInstant();
