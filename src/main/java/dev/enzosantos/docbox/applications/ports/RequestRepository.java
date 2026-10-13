@@ -21,6 +21,8 @@ public interface RequestRepository {
 
   void delete(UUID id);
 
+  void markAsNew(UUID id);
+
   void markAsSent(UUID id, AbstractRequestSentPayload payload);
 
   void markAsAcknowledged(UUID id, AbstractRequestAcknowledgedPayload payload);

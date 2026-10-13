@@ -1,5 +1,5 @@
 package dev.enzosantos.docbox.domain.request_evaluations;
 
-public interface AbstractRequestRejection {
+public interface AbstractRequestRejection extends AbstractRequestEvaluation {
   String getRejectionReason();
 }

@@ -1,3 +1,3 @@
 package dev.enzosantos.docbox.domain.request_evaluations;
 
-public interface AbstractRequestApproval {}
+public interface AbstractRequestApproval extends AbstractRequestEvaluation {}
