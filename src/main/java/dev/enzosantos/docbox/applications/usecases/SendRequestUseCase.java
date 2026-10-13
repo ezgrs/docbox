@@ -10,6 +10,7 @@ import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 public class SendRequestUseCase {
@@ -22,7 +23,12 @@ public class SendRequestUseCase {
   }
 
   public void execute(UUID id, UUID userId) throws InvalidRequestTransitionException {
-    final AbstractRequest request = requestRepository.read(id);
+    final Optional<AbstractRequest> requestResult = requestRepository.read(id);
+    if (requestResult.isEmpty()) {
+      throw new InvalidRequestTransitionException();
+    }
+
+    final AbstractRequest request = requestResult.get();
     if (request instanceof AbstractReceivedRequest
         && ((AbstractEvaluatedRequest) request).getEvaluation()
             instanceof AbstractRequestRejection) {

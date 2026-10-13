@@ -19,6 +19,7 @@ import dev.enzosantos.docbox.domain.requests.AbstractReceivedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +54,7 @@ class SendRequestUseCaseTest {
     final UUID userId = UUID.randomUUID();
     final Instant sentAt = Instant.parse("2026-10-12T12:00:00Z");
 
-    when(requestRepository.read(requestId)).thenReturn(request);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
     when(timeProvider.provideInstant()).thenReturn(sentAt);
 
     useCase.execute(requestId, userId);
@@ -74,7 +75,7 @@ class SendRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
-    when(requestRepository.read(requestId)).thenReturn(sentRequest);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(sentRequest));
 
     assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
@@ -89,7 +90,7 @@ class SendRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
-    when(requestRepository.read(requestId)).thenReturn(acknowledgedRequest);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(acknowledgedRequest));
 
     assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
@@ -109,7 +110,7 @@ class SendRequestUseCaseTest {
             AbstractRequestEvaluation.class,
             Mockito.withSettings().extraInterfaces(AbstractRequestRejection.class));
 
-    when(requestRepository.read(requestId)).thenReturn(receivedRequest);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(receivedRequest));
     when(receivedRequest.getEvaluation()).thenReturn(rejection);
     when(timeProvider.provideInstant()).thenReturn(sentAt);
 
@@ -125,8 +126,23 @@ class SendRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
-    when(requestRepository.read(requestId)).thenReturn(receivedRequest);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(receivedRequest));
     when(receivedRequest.getEvaluation()).thenReturn(evaluation);
+
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+
+    verify(requestRepository).read(requestId);
+    verify(requestRepository, never())
+        .markAsSent(any(UUID.class), any(AbstractRequestSentPayload.class));
+    verify(timeProvider, never()).provideInstant();
+  }
+
+  @Test
+  void shouldRejectSendingRequestThatDoesNotExist() {
+    final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
+
+    when(requestRepository.read(requestId)).thenReturn(Optional.empty());
 
     assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 

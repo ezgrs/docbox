@@ -16,6 +16,7 @@ import dev.enzosantos.docbox.domain.requests.AbstractAcknowledgedRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractSentRequest;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +47,7 @@ class AcknowledgeRequestUseCaseTest {
     final UUID userId = UUID.randomUUID();
     final Instant acknowledgedAt = Instant.parse("2026-10-12T12:00:00Z");
 
-    when(requestRepository.read(requestId)).thenReturn(sentRequest);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(sentRequest));
     when(timeProvider.provideInstant()).thenReturn(acknowledgedAt);
 
     useCase.execute(requestId, userId);
@@ -67,7 +68,7 @@ class AcknowledgeRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
-    when(requestRepository.read(requestId)).thenReturn(acknowledgedRequest);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(acknowledgedRequest));
 
     assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
@@ -82,10 +83,24 @@ class AcknowledgeRequestUseCaseTest {
     final UUID requestId = UUID.randomUUID();
     final UUID userId = UUID.randomUUID();
 
-    when(requestRepository.read(requestId)).thenReturn(request);
+    when(requestRepository.read(requestId)).thenReturn(Optional.of(request));
 
-    assertThrows(
-        InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
+
+    verify(requestRepository).read(requestId);
+    verify(requestRepository, never())
+        .markAsAcknowledged(any(UUID.class), any(AbstractRequestAcknowledgedPayload.class));
+    verify(timeProvider, never()).provideInstant();
+  }
+
+  @Test
+  void shouldRejectAcknowledgingRequestThatDoesNotExist() {
+    final UUID requestId = UUID.randomUUID();
+    final UUID userId = UUID.randomUUID();
+
+    when(requestRepository.read(requestId)).thenReturn(Optional.empty());
+
+    assertThrows(InvalidRequestTransitionException.class, () -> useCase.execute(requestId, userId));
 
     verify(requestRepository).read(requestId);
     verify(requestRepository, never())
