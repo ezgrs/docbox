@@ -24,7 +24,7 @@ class AcceptRequestUseCaseTest {
 
   @Mock private TimeProvider timeProvider;
 
-  @InjectMocks private AcceptRequestUseCase useCase;
+  @InjectMocks private CompleteRequestUseCase useCase;
 
   @Test
   void shouldMarkRequestAsAcceptedWithProvidedValues() {

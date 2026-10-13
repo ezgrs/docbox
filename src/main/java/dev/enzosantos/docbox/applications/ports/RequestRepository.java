@@ -2,6 +2,7 @@ package dev.enzosantos.docbox.applications.ports;
 
 import dev.enzosantos.docbox.domain.requests.AbstractRequest;
 import dev.enzosantos.docbox.domain.requests.AbstractRequestAcknowledgedPayload;
+import dev.enzosantos.docbox.domain.requests.AbstractRequestCompletedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequestEvaluatedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequestRejectedPayload;
 import dev.enzosantos.docbox.domain.requests.AbstractRequestSentPayload;
@@ -17,4 +18,6 @@ public interface RequestRepository {
   void markAsAccepted(UUID id, AbstractRequestEvaluatedPayload payload);
 
   void markAsRejected(UUID id, AbstractRequestRejectedPayload payload);
+
+  void markAsCompleted(UUID id, AbstractRequestCompletedPayload payload);
 }
